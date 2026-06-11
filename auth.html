@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumo Authentication</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+body{
+background:#f4f4f4;
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:30px;
+}
+.auth-container{
+width:100%;
+max-width:420px;
+background:#fff;
+border-radius:22px;
+padding:35px 28px;
+box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+.top-bar{
+width:120px;height:8px;background:#ececec;border-radius:50px;
+margin:auto;position:relative;overflow:hidden;
+}
+.top-bar::before{
+content:'';position:absolute;left:0;top:0;width:45%;height:100%;
+background:#d99200;border-radius:50px;
+}
+h1{text-align:center;margin-top:22px;font-size:34px;color:#333}
+.subtitle{text-align:center;color:#777;margin-top:6px;margin-bottom:28px}
+.tabs{display:flex;gap:12px;margin-bottom:24px}
+.tab{
+flex:1;padding:12px;border:none;border-radius:10px;background:#ececec;
+cursor:pointer;font-weight:600;transition:.3s;
+}
+.tab.active{background:#d99200;color:#fff}
+.input-box{margin-bottom:16px}
+.input-box input{
+width:100%;padding:16px;border:2px solid #ececec;border-radius:12px;
+outline:none;font-size:14px;
+}
+.input-box input:focus{border-color:#d99200}
+.religion-title{margin-top:18px;font-size:15px;font-weight:600;color:#333}
+.religion-sub{font-size:12px;color:#888;margin-bottom:16px}
+.religions{
+display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;
+}
+.religion{
+border:2px solid #ececec;border-radius:12px;padding:12px;cursor:pointer;
+transition:.3s;display:flex;justify-content:center;align-items:center;
+}
+.religion.active{
+background:#fff3df;border-color:#d99200;color:#d99200;
+}
+.submit-btn{
+width:100%;padding:16px;border:none;border-radius:12px;
+background:#d99200;color:#fff;font-size:16px;font-weight:600;
+cursor:pointer;transition:.3s;
+}
+.submit-btn:hover{background:#bc7d00}
+.bottom-text{text-align:center;margin-top:20px;color:#777}
+.bottom-text span{color:#d99200;font-weight:600;cursor:pointer}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<div class="auth-container">
+<div class="top-bar"></div>
+
+<h1 id="form-title">Create Your Account</h1>
+<div class="subtitle">Let's get you started</div>
+
+<div class="tabs">
+<button class="tab active" id="signup-tab">Sign Up</button>
+<button class="tab" id="login-tab">Log In</button>
+</div>
+
+<div id="signup-form">
+
+<div class="input-box">
+<input type="text" id="signup-name" placeholder="Full Name">
+</div>
+
+<div class="input-box">
+<input type="email" id="signup-email" placeholder="Email">
+</div>
+
+<div class="input-box">
+<input type="tel" id="signup-mobile" placeholder="Mobile Number">
+</div>
+
+<div class="input-box">
+<input type="password" id="signup-password" placeholder="Create Password">
+</div>
+
+<div class="religion-title">Select Your Religion(s)</div>
+<div class="religion-sub">You can choose more than one</div>
+
+<div class="religions">
+<div class="religion active">Hinduism</div>
+<div class="religion">Buddhism</div>
+<div class="religion">Christianity</div>
+<div class="religion">Islam</div>
+<div class="religion">Judaism</div>
+<div class="religion">Other</div>
+</div>
+
+<button class="submit-btn" onclick="signup()">Sign Up</button>
+</div>
+
+<div id="login-form" class="hidden">
+
+<div class="input-box">
+<input type="email" id="login-email" placeholder="Email">
+</div>
+
+<div class="input-box">
+<input type="password" id="login-password" placeholder="Password">
+</div>
+
+<button class="submit-btn" onclick="login()">Log In</button>
+</div>
+
+<div class="bottom-text" id="bottom-text">
+Already have an account?
+<span onclick="switchToLogin()">Log In</span>
+</div>
+</div>
+
+<script>
+const signupTab=document.getElementById('signup-tab');
+const loginTab=document.getElementById('login-tab');
+const signupForm=document.getElementById('signup-form');
+const loginForm=document.getElementById('login-form');
+const title=document.getElementById('form-title');
+const bottomText=document.getElementById('bottom-text');
+
+signupTab.addEventListener('click',switchToSignup);
+loginTab.addEventListener('click',switchToLogin);
+
+function switchToLogin(){
+signupForm.classList.add('hidden');
+loginForm.classList.remove('hidden');
+signupTab.classList.remove('active');
+loginTab.classList.add('active');
+title.innerText='Welcome Back';
+bottomText.innerHTML=`Don't have an account? <span onclick="switchToSignup()">Sign Up</span>`;
+}
+
+function switchToSignup(){
+loginForm.classList.add('hidden');
+signupForm.classList.remove('hidden');
+loginTab.classList.remove('active');
+signupTab.classList.add('active');
+title.innerText='Create Your Account';
+bottomText.innerHTML=`Already have an account? <span onclick="switchToLogin()">Log In</span>`;
+}
+
+document.querySelectorAll('.religion').forEach(item=>{
+item.addEventListener('click',()=>item.classList.toggle('active'));
+});
+
+async function signup(){
+
+const name=document.getElementById('signup-name').value.trim();
+const email=document.getElementById('signup-email').value.trim();
+const mobile=document.getElementById('signup-mobile').value.trim();
+const password=document.getElementById('signup-password').value;
+
+const religions=[];
+document.querySelectorAll('.religion.active').forEach(r=>{
+religions.push(r.textContent.trim());
+});
+
+const response=await fetch('/signup',{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({
+name,email,password,mobile,religions
+})
+});
+
+const data=await response.json();
+
+if(data.success){
+alert('Account created successfully!');
+switchToLogin();
+}else{
+alert(data.message || 'Signup failed');
+}
+}
+
+async function login(){
+
+const email=document.getElementById('login-email').value.trim();
+const password=document.getElementById('login-password').value;
+
+const response=await fetch('/login',{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({email,password})
+});
+
+const data=await response.json();
+
+if(data.success){
+alert('Login successful!');
+window.location.href='index.html';
+}else{
+alert(data.message || 'Login failed');
+}
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lumo</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:'Poppins',sans-serif;
+    }
+
+    html{
+      scroll-behavior:smooth;
+    }
+
+    body{
+      background:#efefef;
+      overflow-x:hidden;
+      color:#222;
+    }
+
+    a{
+      text-decoration:none;
+      color:inherit;
+    }
+
+    /* SIDEBAR */
+
+    .sidebar{
+      position:fixed;
+      left:0;
+      top:0;
+      width:290px;
+      height:100vh;
+      background:#d99200;
+      color:white;
+      padding:22px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      z-index:1000;
+    }
+
+    .top-section{
+      display:flex;
+      flex-direction:column;
+      gap:25px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size:14px;
+      font-weight:500;
+    }
+
+    .brand img{
+      width:24px;
+      height:24px;
+      object-fit:contain;
+    }
+
+    .cta-btn{
+      width:fit-content;
+      background:#f5c261;
+      border:none;
+      padding:9px 16px;
+      border-radius:5px;
+      font-size:12px;
+      cursor:pointer;
+      color:#111;
+      transition:0.3s;
+    }
+
+    .cta-btn:hover{
+      background:#e3af48;
+    }
+
+    .hero-text h1{
+      font-size:46px;
+      line-height:1.05;
+      font-weight:500;
+      margin-bottom:20px;
+    }
+
+    .hero-text p{
+      font-size:14px;
+      line-height:1.7;
+      color:#ffeec6;
+      width:90%;
+    }
+
+    .offer-title{
+      margin-top:25px;
+      margin-bottom:15px;
+      font-size:13px;
+      color:#fff0cb;
+    }
+
+    .cards{
+      display:flex;
+      gap:12px;
+    }
+
+    .mini-card{
+      background:#f7c983;
+      color:#111;
+      width:78px;
+      height:72px;
+      border-radius:6px;
+      padding:10px;
+
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+
+      text-align:center;
+      font-size:9px;
+      gap:6px;
+
+      cursor:pointer;
+      transition:0.3s ease;
+    }
+
+    .mini-card:hover{
+      background:#e0ab5d;
+      transform:translateY(-3px);
+    }
+
+    .mini-card span{
+      font-size:20px;
+    }
+
+    .sidebar-footer{
+      display:flex;
+      gap:14px;
+      flex-wrap:wrap;
+      font-size:11px;
+      color:#ffefc9;
+    }
+
+    /* MAIN */
+
+    .main{
+      margin-left:290px;
+      width:calc(100% - 290px);
+      padding:28px 35px;
+    }
+
+    .container{
+      max-width:980px;
+      margin:auto;
+    }
+
+    .hero-banner{
+      width:100%;
+      border-radius:10px;
+      overflow:hidden;
+    }
+
+    .hero-banner img{
+      width:100%;
+      height:360px;
+      object-fit:fill;
+      display:block;
+    }
+
+    .hero-subtitle{
+      text-align:center;
+      margin:35px 0 28px;
+      font-size:22px;
+      color:#333;
+    }
+
+    .partners{
+      display:flex;
+      justify-content:center;
+      flex-wrap:wrap;
+      gap:45px;
+      margin-bottom:90px;
+      color:#d99200;
+      font-weight:500;
+    }
+
+    .section-title{
+      text-align:center;
+      font-size:52px;
+      color:#d99200;
+      font-weight:500;
+      margin-bottom:12px;
+    }
+
+    .section-subtitle{
+      text-align:center;
+      width:70%;
+      margin:auto;
+      color:#666;
+      margin-bottom:45px;
+      font-size:14px;
+    }
+
+    .stats-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px;
+    }
+
+    .stat-box{
+      background:#f2c88f;
+      border-radius:12px;
+      min-height:220px;
+
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+
+      padding:35px;
+      text-align:center;
+    }
+
+    .stat-box h2{
+      font-size:75px;
+      font-weight:500;
+      color:#b66d00;
+    }
+
+    .stat-box p{
+      margin-top:10px;
+      color:#b66d00;
+    }
+
+    .stat-box img{
+      width:130px;
+      height:auto;
+      object-fit:contain;
+    }
+
+    .reliable{
+      margin-top:120px;
+    }
+
+    .reliable-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:35px;
+      margin-top:50px;
+    }
+
+    .reliable-card{
+      text-align:center;
+    }
+
+    .reliable-card img{
+      width:100%;
+      max-width:320px;
+      height:240px;
+      object-fit:fill;
+      border-radius:10px;
+      background:#e8eef3;
+      padding:20px;
+    }
+
+    .reliable-card h4{
+      margin-top:18px;
+      color:#d99200;
+      font-size:18px;
+    }
+
+    .reliable-card p{
+      margin-top:8px;
+      font-size:13px;
+      color:#555;
+      line-height:1.7;
+    }
+
+    .large-image{
+      margin-top:100px;
+    }
+
+    .large-image img{
+      width:100%;
+      height:420px;
+      object-fit:fill;
+      border-radius:10px;
+    }
+
+    .software{
+      margin-top:110px;
+    }
+
+    .feature-row{
+      margin-top:45px;
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:20px;
+    }
+
+    .feature{
+      background:#3f4b00;
+      color:white;
+      height:120px;
+      border-radius:10px;
+
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+
+      text-align:center;
+    }
+
+    .feature-icon{
+      font-size:30px;
+      margin-bottom:10px;
+    }
+
+    .download{
+      margin-top:110px;
+      position:relative;
+      border-radius:10px;
+      overflow:hidden;
+    }
+
+    .download img{
+      width:100%;
+      height:380px;
+      object-fit:fill;
+      display:block;
+    }
+
+    .download-content{
+      position:absolute;
+      left:40px;
+      top:50%;
+      transform:translateY(-50%);
+      color:white;
+      max-width:420px;
+    }
+
+    .download-content h2{
+      font-size:48px;
+      line-height:1.1;
+      font-weight:500;
+      margin-bottom:20px;
+    }
+
+    .download-content button{
+      background:#d99200;
+      border:none;
+      color:white;
+      padding:12px 24px;
+      border-radius:6px;
+      cursor:pointer;
+    }
+
+    footer{
+      margin-top:90px;
+      padding:40px 0 70px;
+
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      gap:40px;
+    }
+
+    .footer-left img{
+      width:90px;
+      height:90px;
+      object-fit:contain;
+    }
+
+    .footer-right{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      color:#555;
+      font-size:14px;
+    }
+
+    .terms{
+      margin-top:25px;
+      font-size:13px;
+      color:#888;
+    }
+
+    @media(max-width:1100px){
+
+      .sidebar{
+        position:relative;
+        width:100%;
+        height:auto;
+      }
+
+      .main{
+        margin-left:0;
+        width:100%;
+      }
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <aside class="sidebar">
+
+    <div class="top-section">
+
+      <div class="brand">
+        <img src="logo.png">
+        <span>Lumo</span>
+      </div>
+
+      <button class="cta-btn" onclick="window.location.href='auth.html'">
+        Get started
+      </button>
+
+      <div class="hero-text">
+
+        <h1>
+          Lumo - Your<br>
+          Spiritual Journey<br>
+          Guide
+        </h1>
+
+        <p>
+          An App made just for your convenience!
+          Download the Free App Now!
+        </p>
+
+      </div>
+
+      <div>
+
+        <div class="offer-title">Our offerings</div>
+
+        <div class="cards">
+
+          <div class="mini-card" onclick="scrollToSection('discover')">
+            <span>⚡</span>
+            <div>Discover and Locate</div>
+          </div>
+
+          <div class="mini-card" onclick="scrollToSection('expense')">
+            <span>🌐</span>
+            <div>Expense Management</div>
+          </div>
+
+          <div class="mini-card" onclick="scrollToSection('technology')">
+            <span>🛡</span>
+            <div>Advanced Technology</div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="sidebar-footer">
+      <a href="#">Contact</a>
+      <a href="#">Social</a>
+      <a href="#">Address</a>
+      <a href="#">Legal Terms</a>
+    </div>
+
+  </aside>
+
+  <main class="main">
+
+    <div class="container">
+
+      <div class="hero-banner">
+        <img src="thumbnail.png">
+      </div>
+
+      <div class="hero-subtitle">
+        We help you Find your God, and your Path to your Religion
+      </div>
+
+      <div class="partners">
+        <span>Blooming</span>
+        <span>BuildRight</span>
+        <span>Flowbot</span>
+        <span>EXPOR</span>
+        <span>eRedo</span>
+      </div>
+
+      <section id="discover">
+
+        <h2 class="section-title">Discover And Locate</h2>
+
+        <p class="section-subtitle">
+          Find your choice of Religion's Worship Places,
+          and closest routes to them.
+        </p>
+
+        <div class="stats-grid">
+
+          <div class="stat-box">
+            <h2>2x</h2>
+            <p>Double Your Productivity</p>
+          </div>
+
+          <div class="stat-box">
+            <img src="graph.png">
+            <p>Save your Time</p>
+          </div>
+
+          <div class="stat-box">
+            <h2>↔</h2>
+            <p>Socialize easily</p>
+          </div>
+
+          <div class="stat-box">
+            <h2>130%</h2>
+            <p>More Activity</p>
+          </div>
+
+        </div>
+
+      </section>
+
+      <section class="reliable" id="expense">
+
+        <h2 class="section-title">The Most Reliable App</h2>
+
+        <div class="reliable-grid">
+
+          <div class="reliable-card">
+            <img src="soul.png">
+          </div>
+
+          <div class="reliable-card">
+            <img src="maps.png">
+          </div>
+
+        </div>
+
+      </section>
+
+      <section class="large-image">
+        <img src="image1.png">
+      </section>
+
+      <section class="software" id="technology">
+
+        <h2 class="section-title">First Class Software</h2>
+
+        <div class="feature-row">
+
+          <div class="feature">
+            <div class="feature-icon">🧾</div>
+            <div>Safety</div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon">☝</div>
+            <div>Secure</div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon">📊</div>
+            <div>Save Time</div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon">👥</div>
+            <div>Family Plans</div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <section class="download">
+
+        <img src="image2.png">
+
+        <div class="download-content">
+
+          <h2>
+            Download Lumo, and
+            Get Everything from
+            your Phone
+          </h2>
+
+          <button onclick="window.location.href='auth.html'">
+            Get started
+          </button>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+  <script>
+
+    function scrollToSection(id){
+      document.getElementById(id).scrollIntoView({
+        behavior:'smooth'
+      });
+    }
+
+  </script>
+
+</body>
+</html>
