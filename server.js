@@ -267,7 +267,72 @@ app.get("/", (req, res) => {
     res.sendFile(__dirname + "/index.html");
 });
 const PORT = process.env.PORT || 3000;
+app.post(
+  "/update-religions",
+  async (req, res) => {
 
+    try {
+
+      const {
+        userId,
+        religions
+      } = req.body;
+
+      await db.query(
+        `
+        UPDATE users
+        SET
+        hinduism = $1,
+        buddhism = $2,
+        christianity = $3,
+        islam = $4,
+        judaism = $5,
+        other = $6
+        WHERE id = $7
+        `,
+        [
+          religions.includes(
+            "Hinduism"
+          ),
+
+          religions.includes(
+            "Buddhism"
+          ),
+
+          religions.includes(
+            "Christianity"
+          ),
+
+          religions.includes(
+            "Islam"
+          ),
+
+          religions.includes(
+            "Judaism"
+          ),
+
+          religions.includes(
+            "Other"
+          ),
+
+          userId
+        ]
+      );
+
+      res.json({
+        success: true
+      });
+
+    } catch (err) {
+
+      console.error(err);
+
+      res.status(500).json({
+        success: false
+      });
+    }
+  }
+);
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });

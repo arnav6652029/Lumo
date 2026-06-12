@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'favourite_temples_screen.dart';
+import 'package:lumo/services/api_services.dart';
 
 Future<void> openWebPage() async {
   final Uri url = Uri.parse(
-    "https://undamageable-histogenetically-bowen.ngrok-free.dev/",
+    "https://lumo-api-t204.onrender.com",
   );
 
   if (!await launchUrl(
@@ -72,7 +73,7 @@ Widget accountTile({
   );
 }
 
-class AccountScreen extends StatelessWidget {
+class AccountScreen extends StatefulWidget {
 
   final int userId;
   final String userName;
@@ -85,6 +86,168 @@ class AccountScreen extends StatelessWidget {
     required this.religions,
   });
 
+  @override
+  State<AccountScreen> createState() =>
+      _AccountScreenState();
+}
+
+class _AccountScreenState
+    extends State<AccountScreen> {
+
+  late List<String> religions;
+
+  @override
+  void initState() {
+    super.initState();
+
+    religions = List.from(
+      widget.religions,
+    );
+  }
+  void _showReligionEditor(
+    BuildContext context,
+  ) {
+
+    List<String> selected =
+        List.from(religions);
+
+    final allReligions = [
+      "Hinduism",
+      "Buddhism",
+      "Christianity",
+      "Islam",
+      "Judaism",
+      "Other",
+    ];
+
+    showDialog(
+      context: context,
+      builder: (context) {
+
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+
+            return AlertDialog(
+              title: const Text(
+                "Edit Religions",
+              ),
+
+              content: Column(
+                mainAxisSize:
+                    MainAxisSize.min,
+
+                children:
+                    allReligions.map(
+                  (religion) {
+
+                    return CheckboxListTile(
+                      title: Text(
+                        religion,
+                      ),
+
+                      value:
+                          selected.contains(
+                        religion,
+                      ),
+
+                      onChanged: (
+                        value,
+                      ) {
+
+                        setDialogState(
+                          () {
+
+                            if (value ==
+                                true) {
+
+                            if (value == true) {
+
+                              if (!selected.contains(religion)) {
+                                selected.add(religion);
+                              }
+
+                            }
+
+                            } else {
+
+                              if (selected
+                                      .length >
+                                  1) {
+
+                                selected.remove(
+                                  religion,
+                                );
+                              }
+                            }
+                          },
+                        );
+                      },
+                    );
+                  },
+                ).toList(),
+              ),
+
+              actions: [
+
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(
+                      context,
+                    );
+                  },
+                  child: const Text(
+                    "Cancel",
+                  ),
+                ),
+
+                ElevatedButton(
+                  onPressed: () async {
+
+                    try {
+
+                      await ApiService.updateReligions(
+                        widget.userId,
+                        selected,
+                      );
+
+                      setState(() {
+                        religions = selected;
+                      });
+
+                      Navigator.pop(context);
+
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            "Religions updated",
+                          ),
+                        ),
+                      );
+
+                    } catch (e) {
+
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            "Failed to update religions",
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text(
+                    "Save",
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
 
@@ -122,7 +285,7 @@ class AccountScreen extends StatelessWidget {
                   const SizedBox(height: 10),
 
                   Text(
-                    userName,
+                    widget.userName,
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -143,15 +306,20 @@ class AccountScreen extends StatelessWidget {
                 children: [
 
                   Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
-
-                    children: const [
-                      Text(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
                         "My Religions",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
+                      ),
+
+                      TextButton(
+                        onPressed: () {
+                          _showReligionEditor(context);
+                        },
+                        child: const Text("Edit"),
                       ),
                     ],
                   ),
@@ -176,8 +344,8 @@ class AccountScreen extends StatelessWidget {
                         MaterialPageRoute(
                           builder: (_) => 
                           FavouriteTemplesScreen(
-                            userId: userId,
-                            userName: userName,
+                            userId: widget.userId,
+                            userName: widget.userName,
                             religions: religions,
                           ),
                         ),

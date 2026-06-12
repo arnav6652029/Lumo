@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'package:lumo/models/temple.dart';
 import 'package:http/http.dart' as http;
 
+
 class ApiService {
 
   static const String baseUrl =
-      "http://192.168.1.6:3000";
+      "https://lumo-api-t204.onrender.com";
       
   static Future<List<Temple>> getTemples(
     String religion) async {
@@ -102,6 +103,26 @@ class ApiService {
           (e) => e["temple_id"] as int,
         )
         .toList();
+  }
+  static Future<void> updateReligions(
+    int userId,
+    List<String> religions,
+  ) async {
+
+    await http.post(
+      Uri.parse(
+        "$baseUrl/update-religions",
+      ),
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: jsonEncode({
+        "userId": userId,
+        "religions": religions,
+      }),
+    );
   }
   static Future<void> addFavourite(
     int userId,
