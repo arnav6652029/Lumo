@@ -9,20 +9,15 @@ app.use(express.static(__dirname));
 
 const db = new Pool({
 
-    host: "dpg-d8l9ure7r5hc739qbkag-a.singapore-postgres.render.com",
-
-    port: 5432,
-
-    database: "lumo_lb6a",
-
-    user: "lumo_user",
-
-    password: "s9mBlMPQjGM9V5aRprmwNMlEAKgFAucL",
+    connectionString:
+        process.env.DATABASE_URL,
 
     ssl: {
         rejectUnauthorized: false
     }
+
 });
+
 db.query("SELECT NOW()")
 .then(() => console.log("PostgreSQL Connected"))
 .catch(err => console.error(err));
