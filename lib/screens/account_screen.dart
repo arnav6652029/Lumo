@@ -157,25 +157,28 @@ class _AccountScreenState
                         setDialogState(
                           () {
 
-                            if (value ==
-                                true) {
-
                             if (value == true) {
 
                               if (!selected.contains(religion)) {
                                 selected.add(religion);
                               }
 
-                            }
-
                             } else {
 
-                              if (selected
-                                      .length >
-                                  1) {
+                              if (selected.length > 1) {
 
                                 selected.remove(
                                   religion,
+                                );
+
+                              } else {
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      "At least one religion must remain selected",
+                                    ),
+                                  ),
                                 );
                               }
                             }
