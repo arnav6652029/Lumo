@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 class ApiService {
 
   static const String baseUrl =
-      "https://undamageable-histogenetically-bowen.ngrok-free.dev";
+      "http://192.168.1.6:3000";
       
   static Future<List<Temple>> getTemples(
     String religion) async {

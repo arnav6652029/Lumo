@@ -1,5 +1,5 @@
 const express = require("express");
-const mysql = require("mysql2/promise");
+const { Pool } = require("pg");
 const bcrypt = require("bcrypt");
 
 const app = express();
@@ -7,60 +7,25 @@ const app = express();
 app.use(express.json());
 app.use(express.static(__dirname));
 
-let db;
+const db = new Pool({
 
-/* ------------------ MYSQL SETUP ------------------ */
+    host: "dpg-d8l9ure7r5hc739qbkag-a.singapore-postgres.render.com",
 
-async function initializeDatabase() {
+    port: 5432,
 
-    const connection = await mysql.createConnection({
-        host: "localhost",
-        user: "root",
-        password: "Arnav@1234"
-    });
+    database: "lumo_lb6a",
 
-    await connection.query(`
-        CREATE DATABASE IF NOT EXISTS Users
-    `);
+    user: "lumo_user",
 
-    await connection.end();
+    password: "s9mBlMPQjGM9V5aRprmwNMlEAKgFAucL",
 
-    db = await mysql.createConnection({
-        host: "localhost",
-        user: "root",
-        password: "Arnav@1234",
-        database: "Users"
-    });
-
-    await db.query(`
-        CREATE TABLE IF NOT EXISTS users (
-
-            id INT AUTO_INCREMENT PRIMARY KEY,
-
-            name VARCHAR(255) NOT NULL,
-
-            email VARCHAR(255) NOT NULL UNIQUE,
-
-            password VARCHAR(255) NOT NULL,
-
-            mobile VARCHAR(50),
-
-            Hinduism BOOLEAN DEFAULT FALSE,
-            Buddhism BOOLEAN DEFAULT FALSE,
-            Christianity BOOLEAN DEFAULT FALSE,
-            Islam BOOLEAN DEFAULT FALSE,
-            Judaism BOOLEAN DEFAULT FALSE,
-            Other BOOLEAN DEFAULT FALSE,
-
-            created_at TIMESTAMP
-            DEFAULT CURRENT_TIMESTAMP
-
-        )
-    `);
-
-    console.log("MySQL Ready");
-}
-
+    ssl: {
+        rejectUnauthorized: false
+    }
+});
+db.query("SELECT NOW()")
+.then(() => console.log("PostgreSQL Connected"))
+.catch(err => console.error(err));
 /* ------------------ SIGNUP ------------------ */
 
 app.post("/signup", async (req, res) => {
@@ -75,11 +40,12 @@ app.post("/signup", async (req, res) => {
             religions
         } = req.body;
 
-        const [existing] = await db.query(
-            "SELECT * FROM users WHERE email = ?",
+        const existingResult = await db.query(
+            "SELECT * FROM users WHERE email = $1",
             [email]
         );
 
+        const existing = existingResult.rows;
         if (existing.length > 0) {
 
             return res.json({
@@ -93,38 +59,37 @@ app.post("/signup", async (req, res) => {
 
         await db.query(
 
-            `INSERT INTO users (
+        `INSERT INTO users (
 
-                name,
-                email,
-                password,
-                mobile,
+            name,
+            email,
+            password,
+            mobile,
+            "Hinduism",
+            "Buddhism",
+            "Christianity",
+            "Islam",
+            "Judaism",
+            "Other"
 
-                Hinduism,
-                Buddhism,
-                Christianity,
-                Islam,
-                Judaism,
-                Other
+        )
 
-            )
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [
+        [
+            name,
+            email,
+            hashedPassword,
+            mobile,
 
-                name,
-                email,
-                hashedPassword,
-                mobile,
+            religions.includes("Hinduism"),
+            religions.includes("Buddhism"),
+            religions.includes("Christianity"),
+            religions.includes("Islam"),
+            religions.includes("Judaism"),
+            religions.includes("Other")
+        ]
 
-                religions.includes("Hinduism"),
-                religions.includes("Buddhism"),
-                religions.includes("Christianity"),
-                religions.includes("Islam"),
-                religions.includes("Judaism"),
-                religions.includes("Other")
-
-            ]
         );
 
         res.json({
@@ -149,11 +114,13 @@ app.post("/favourites/add", async (req, res) => {
 
     try {
 
-        await db.execute(
+        await db.query(
             `
-            INSERT IGNORE INTO favourite_temples
+            INSERT INTO favourite_temples
             (user_id, temple_id)
-            VALUES (?, ?)
+            VALUES ($1,$2)
+            ON CONFLICT (user_id, temple_id)
+            DO NOTHING
             `,
             [userId, templeId]
         );
@@ -177,11 +144,11 @@ app.post("/favourites/remove", async (req, res) => {
 
     try {
 
-        await db.execute(
+        await db.query(
             `
             DELETE FROM favourite_temples
-            WHERE user_id = ?
-            AND temple_id = ?
+            WHERE user_id = $1
+            AND temple_id = $2
             `,
             [userId, templeId]
         );
@@ -203,16 +170,16 @@ app.get("/favourites/:userId", async (req, res) => {
 
     try {
 
-        const [rows] = await db.execute(
+        const result = await db.query(
             `
             SELECT temple_id
             FROM favourite_temples
-            WHERE user_id = ?
+            WHERE user_id = $1
             `,
             [req.params.userId]
         );
 
-        res.json(rows);
+        res.json(result.rows);
 
     } catch(err) {
 
@@ -235,10 +202,12 @@ app.post("/login", async (req, res) => {
             password
         } = req.body;
 
-        const [rows] = await db.query(
-            "SELECT * FROM users WHERE email = ?",
+        const result = await db.query(
+            "SELECT * FROM users WHERE email = $1",
             [email]
         );
+
+        const rows = result.rows;
 
         if (rows.length === 0) {
 
@@ -249,12 +218,17 @@ app.post("/login", async (req, res) => {
         }
 
         const user = rows[0];
+        console.log("USER FOUND:");
+        console.log(user);
 
         const valid =
             await bcrypt.compare(
                 password,
                 user.password
             );
+        console.log("Entered Password:", password);
+        console.log("Stored Hash:", user.password);
+        console.log("Password Valid:", valid);
 
         if (!valid) {
 
@@ -266,12 +240,12 @@ app.post("/login", async (req, res) => {
 
         const religions = [];
 
-        if (user.Hinduism) religions.push("Hinduism");
-        if (user.Buddhism) religions.push("Buddhism");
-        if (user.Christianity) religions.push("Christianity");
-        if (user.Islam) religions.push("Islam");
-        if (user.Judaism) religions.push("Judaism");
-        if (user.Other) religions.push("Other");
+        if (user.hinduism) religions.push("Hinduism");
+        if (user.buddhism) religions.push("Buddhism");
+        if (user.christianity) religions.push("Christianity");
+        if (user.islam) religions.push("Islam");
+        if (user.judaism) religions.push("Judaism");
+        if (user.other) religions.push("Other");
 
         res.json({
             success: true,
@@ -297,32 +271,35 @@ app.post("/login", async (req, res) => {
 app.get("/", (req, res) => {
     res.sendFile(__dirname + "/index.html");
 });
+const PORT = process.env.PORT || 3000;
 
-/* ------------------ START SERVER ------------------ */
-
-initializeDatabase()
-.then(() => {
-
-    app.get("/temples", async (req, res) => {
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
+app.get("/temples", async (req, res) => {
 
     try {
 
         const religion = req.query.religion;
 
-        let query = "SELECT * FROM temples";
-        let params = [];
+        let result;
 
         if (religion) {
-            query += " WHERE religion = ?";
-            params.push(religion);
+
+            result = await db.query(
+                "SELECT * FROM temples WHERE religion = $1",
+                [religion]
+            );
+
+        } else {
+
+            result = await db.query(
+                "SELECT * FROM temples"
+            );
+
         }
 
-        const [rows] = await db.query(
-            query,
-            params
-        );
-
-        res.json(rows);
+        res.json(result.rows);
 
     } catch (err) {
 
@@ -332,17 +309,19 @@ initializeDatabase()
             success: false,
             message: "Server Error"
         });
+
     }
+
 });
 app.get("/featured-temples", async (req, res) => {
 
     try {
 
-        const [rows] = await db.query(
-            "SELECT * FROM temples WHERE featured = TRUE"
+        const result = await db.query(
+            "SELECT * FROM temples WHERE featured = true"
         );
 
-        res.json(rows);
+        res.json(result.rows);
 
     } catch (err) {
 
@@ -352,23 +331,7 @@ app.get("/featured-temples", async (req, res) => {
             success: false,
             message: "Server Error"
         });
+
     }
-});
-
-    app.listen(3000, () => {
-
-        console.log(
-            "Server running at http://localhost:3000"
-        );
-
-    });
-
-})
-.catch(err => {
-
-    console.error(
-        "Database initialization failed:",
-        err
-    );
 
 });
