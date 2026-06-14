@@ -60,12 +60,12 @@ app.post("/signup", async (req, res) => {
             email,
             password,
             mobile,
-            "Hinduism",
-            "Buddhism",
-            "Christianity",
-            "Islam",
-            "Judaism",
-            "Other"
+            "hinduism",
+            "buddhism",
+            "christianity",
+            "islam",
+            "judaism",
+            "other"
 
         )
 
